@@ -5,6 +5,7 @@ public class Album {
     private int id;
     private String name;
     private int artistId;
+    private String artistName;
 
     public int getId() {
         return id;
@@ -28,5 +29,18 @@ public class Album {
 
     public void setArtistId(int artistId) {
         this.artistId = artistId;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
+    }
+
+    @Override
+    public String toString() {
+        return this.name + " ( " + this.artistName + " ) ";
     }
 }

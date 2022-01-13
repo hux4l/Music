@@ -23,6 +23,6 @@ public class Artist {
 
     @Override
     public String toString() {
-        return this.id + " : " + this.name + "\n";
+        return this.id + " : " + this.name;
     }
 }

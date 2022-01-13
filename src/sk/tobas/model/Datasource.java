@@ -45,13 +45,10 @@ public class Datasource {
         }
     }
 
-    public List<Artist> queryArtists() throws SQLException {
-        Statement statement = null;
-        ResultSet results = null;
+    public List<Artist> queryArtists() {
 
-        try {
-            statement = conn.createStatement();
-            results = statement.executeQuery("SELECT * FROM " + TABLE_ARTIST);
+        try (Statement statement = conn.createStatement();
+            ResultSet results = statement.executeQuery("SELECT * FROM " + TABLE_ARTIST)) {
 
             List<Artist> artists = new ArrayList<>();
             while (results.next()) {
@@ -61,24 +58,33 @@ public class Datasource {
                 artists.add(artist);
             }
             return artists;
+
         } catch (SQLException e) {
             System.out.println("Query failed: " + e.getMessage());
             return null;
-        } finally {
-            try {
-                if (results != null) {
-                    results.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Can't close results: " + e.getMessage());
+        }
+    }
+
+    public List<Album> getAlbumByArtist(String name) {
+        try (Statement statement = conn.createStatement();
+            ResultSet results = statement.executeQuery("SELECT albums.name, artists.name AS artist " +
+                    "FROM albums " +
+                    "INNER JOIN artists " +
+                    "ON albums.artist=artists._id " +
+                    "WHERE artists.name = '" + name + "'")) {
+
+            List<Album> albums = new ArrayList<>();
+            while (results.next()) {
+                Album album = new Album();
+                album.setName(results.getString("name"));
+                album.setArtistName(results.getString("artist"));
+                albums.add(album);
             }
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Can't close connection: " + e.getMessage());
-            }
+            return albums;
+
+        } catch (SQLException e) {
+            System.out.println("Can't find any artist: " + e.getMessage());
+            return null;
         }
     }
 }
