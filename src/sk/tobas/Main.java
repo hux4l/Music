@@ -36,7 +36,7 @@ public class Main {
             System.out.println(album.toString());
         }
 
-        List<SongArtist> songs = datasource.getSongsByArtist("Genesis");
+        List<SongArtist> songs = datasource.getSongsByArtist("Queen");
         if (songs == null) {
             System.out.println("No songs for artist!");
             return;

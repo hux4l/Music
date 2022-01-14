@@ -1,6 +1,5 @@
 package sk.tobas.model;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +28,18 @@ public class Datasource {
     public static final String TABLE_ARTISTS_SONG_VIEW = "songs_artist";
     // view can be created here as well
 
+    // to prevent SQL injection
+    public static final String QUERY_VIEW_ARTISTS_SONG_PREP = "SELECT " + COL_SONG_TRACK + ", " + COL_ALBUM_ARTIST + ", " + COL_ALIAS_SONGS + ", " + COL_ALBUM_NAME + " FROM " + TABLE_ARTISTS_SONG_VIEW + " WHERE " + COL_ALBUM_ARTIST + " = ?";
+
     private Connection conn;
+    private PreparedStatement getSongsFromArtists;
 
     // open sql connection
     public boolean open() {
         try {
             conn = DriverManager.getConnection(CONNECTION_STRING);
+            // prepare statement
+            getSongsFromArtists = conn.prepareStatement(QUERY_VIEW_ARTISTS_SONG_PREP);
             return true;
         } catch (SQLException e) {
             System.out.println("Couldn't connect to database: " + e.getMessage());
@@ -45,6 +50,10 @@ public class Datasource {
     // close sql connection
     public void close() {
         try {
+            if (getSongsFromArtists != null) {
+                getSongsFromArtists.close();
+            }
+
             if(conn != null) {
                 conn.close();
             }
@@ -159,16 +168,18 @@ public class Datasource {
     }
 
     // get track number, album name artist and song names from artist based on name from SQL view
+    // refactored to prevent SQL injection
     public List<SongArtist> getSongsByArtist(String artist) {
-        StringBuilder sb = new StringBuilder("SELECT " + COL_SONG_TRACK + ", " + COL_ALBUM_ARTIST + ", " + COL_ALIAS_SONGS + ", " + COL_ALBUM_NAME + " FROM " + TABLE_ARTISTS_SONG_VIEW + " WHERE " + COL_ALBUM_ARTIST + "=\"" + artist + "\"");
-        try (Statement statement = conn.createStatement();
-            ResultSet results = statement.executeQuery(sb.toString())) {
+
+        try {
+            getSongsFromArtists.setString(1, artist);
+            ResultSet results = getSongsFromArtists.executeQuery();
 
             List<SongArtist> songArtists = new ArrayList<>();
             while (results.next()) {
                 SongArtist song = new SongArtist();
                 song.setTrack(results.getInt(COL_SONG_TRACK));
-                song.setArtistName(results.getString(COL_ALBUM_NAME));
+                song.setArtistName(results.getString(COL_ALBUM_ARTIST));
                 song.setSongTitle(results.getString(COL_ALIAS_SONGS));
                 song.setAlbumName(results.getString(COL_ALBUM_NAME));
 
