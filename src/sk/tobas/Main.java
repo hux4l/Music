@@ -3,8 +3,8 @@ package sk.tobas;
 import sk.tobas.model.Album;
 import sk.tobas.model.Artist;
 import sk.tobas.model.Datasource;
+import sk.tobas.model.SongArtist;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
@@ -35,6 +35,26 @@ public class Main {
         for (Album album: albums) {
             System.out.println(album.toString());
         }
+
+        List<SongArtist> songs = datasource.getSongsByArtist("Genesis");
+        if (songs == null) {
+            System.out.println("No songs for artist!");
+            return;
+        }
+
+        for (SongArtist songArtist: songs) {
+            if(songArtist.getTrack() == 1) System.out.println(songArtist.getArtistName() + " : " + songArtist.getAlbumName());
+            System.out.println(songArtist.toString());
+        }
+
+        int rowsCount = datasource.getCount("artists");
+        if (rowsCount == -1) {
+            System.out.println("No records found");
+        } else {
+            System.out.println("Table has " + rowsCount + " rows");
+        }
+
+        datasource.querySongsMetadata();
 
         datasource.close();
     }
