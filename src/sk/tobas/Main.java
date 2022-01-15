@@ -5,6 +5,7 @@ import sk.tobas.model.Artist;
 import sk.tobas.model.Datasource;
 import sk.tobas.model.SongArtist;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
@@ -54,7 +55,24 @@ public class Main {
             System.out.println("Table has " + rowsCount + " rows");
         }
 
-        datasource.querySongsMetadata();
+        /*
+        try {
+            System.out.println(datasource.insertArtist("Queen"));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            System.out.println(datasource.insertAlbum("The Game", datasource.insertArtist("Queen")));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        */
+
+        // datasource.querySongsMetadata();
+
+        datasource.insertSong("Play the Game", "Queen", "The Game", 1);
+
 
         datasource.close();
     }
